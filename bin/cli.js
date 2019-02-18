@@ -259,12 +259,12 @@ function invoke(env) {
     });
 
   commander
-    .command('seed:run')
+    .command('seed:run [file]')
     .description('        Run seed files.')
     .option('--verbose', 'verbose')
-    .action(() => {
+    .action((file) => {
       pending = initKnex(env, commander.opts())
-        .seed.run()
+        .seed.run({ file })
         .spread((log) => {
           if (log.length === 0) {
             success(color.cyan('No seed files exist'));
