@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import mkdirp from 'mkdirp';
 import Promise from 'bluebird';
-import { filter, includes, map, bind, template, each, extend } from 'lodash';
+import { filter, includes, map, bind, template, each, extend, startsWith } from 'lodash';
 
 // The new seeds we're performing, typically called from the `knex.seed`
 // interface on the main `knex` object. Passes the `knex` instance performing
@@ -42,6 +42,7 @@ Seeder.prototype.make = function(name, config) {
 Seeder.prototype._listAll = Promise.method(function(config) {
   this.config = this.setConfig(config);
   const loadExtensions = this.config.loadExtensions;
+  const only = this.config.file;
   return Promise.promisify(fs.readdir, { context: fs })(
     this._absoluteConfigDir()
   )
@@ -49,7 +50,7 @@ Seeder.prototype._listAll = Promise.method(function(config) {
     .then((seeds) =>
       filter(seeds, function(value) {
         const extension = path.extname(value);
-        return includes(loadExtensions, extension);
+        return includes(loadExtensions, extension) && (!only || startsWith(value, only));
       }).sort()
     );
 });
